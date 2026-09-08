@@ -1,0 +1,38 @@
+# Raw and intermediate sequencing data (large, shouldn't live in git)
+*.fastq
+*.fastq.gz
+*.fq
+*.fq.gz
+*.bam
+*.bai
+*.sam
+
+# Genome/annotation reference files (large, download separately)
+*.fa
+*.fasta
+*.fna
+*.gtf
+*.gff
+*.2bit
+star_index/
+genome_index/
+
+# Salmon / STAR output directories
+*.salmon_quant/
+*_STARtmp/
+Log.out
+Log.progress.out
+_STARgenome/
+
+# QC report directories (regenerate on demand)
+*qualimap-report/
+multiqc_data/
+
+# Conda / R environment junk
+.Rhistory
+.RData
+.Rproj.user/
+__pycache__/
+
+# OS junk
+.DS_Store

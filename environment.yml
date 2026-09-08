@@ -1,0 +1,34 @@
+# RNA-seq pipeline environment
+#
+# M2 / Apple Silicon note:
+# Several bioinformatics packages (STAR, salmon, deeptools, qualimap) do not
+# ship native osx-arm64 builds on bioconda. Force conda to use the Intel
+# (osx-64) channel subdir so it installs binaries that run under Rosetta 2:
+#
+#   conda config --env --set subdir osx-64
+#   CONDA_SUBDIR=osx-64 conda env create -f environment.yml
+#
+# If a specific package still fails to resolve, try creating the env first,
+# then installing that one package with `CONDA_SUBDIR=osx-64 conda install -n rna-seq <pkg>`.
+
+name: rna-seq
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - fastqc
+  - fastp
+  - multiqc
+  - star
+  - samtools
+  - deeptools
+  - salmon
+  - qualimap
+  - gffread
+  - sra-tools     # for downloading fastq via prefetch/fasterq-dump if needed
+
+# Separate env for the R/DESeq2 half, since bioconductor R packages
+# resolve much faster in their own environment.
+# Create with:
+#   conda create -n deseq2 -c bioconda -c conda-forge -c r r-essentials r-base bioconductor-deseq2 bioconductor-tximport r-ggplot2
