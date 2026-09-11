@@ -54,7 +54,7 @@ rna-seq-learning/
 
 ## Status
 
-- [ ] Phase 1: environment setup
+- [x] Phase 1: environment setup
 - [ ] Phase 1: QC + trimming
 - [ ] Phase 1: alignment (STAR)
 - [ ] Phase 1: quantification (Salmon)
