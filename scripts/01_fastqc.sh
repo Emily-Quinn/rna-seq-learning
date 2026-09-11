@@ -10,7 +10,7 @@ mkdir -p "$OUT_DIR"
 
 for f in "$FASTQ_DIR"/*.fastq.gz; do
   echo "Running FastQC on $f"
-  fastqc "$f" -d "$OUT_DIR" -o "$OUT_DIR"
+  fastqc "$f" -o "$OUT_DIR"
 done
 
 echo "Combining reports with MultiQC..."
