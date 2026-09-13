@@ -18,7 +18,17 @@ GitHub writeup for this phase.
 
 ### 1. Pre-alignment QC
 
--
+an FastQC on all 8 raw fastq.gz files (4 samples × R1/R2), then combined into one summary with MultiQC.
+
+**Command:** `./scripts/01_fastqc.sh data/raw_fastq docs/qc_output`
+
+**Key findings:**
+- Adapter content: all 8 samples under 0.1% contamination — very clean data
+- Overrepresented sequences: all 8 samples under 1% — no contamination artifacts
+- Per-base sequence quality: consistent with expectations for Illumina Genome Analyzer II data (older platform, shorter 37bp reads)
+- No red flags severe enough to warrant anything beyond standard trimming
+
+Full report: [`docs/qc_output/multiqc_report.html`](qc_output/multiqc_report.html)
 
 ### 2. Trimming
 
