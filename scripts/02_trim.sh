@@ -21,4 +21,4 @@ fastp \
 
 echo "Trimmed reads written to $OUT_DIR"
 echo "Re-run FastQC on the trimmed files to confirm improvement:"
-echo "  fastqc $OUT_DIR/${SAMPLE}_R1.trimmed.fastq.gz -d $OUT_DIR -o $OUT_DIR"
+echo "  fastqc $OUT_DIR/${SAMPLE}_R1.trimmed.fastq.gz -o $OUT_DIR"
