@@ -55,7 +55,7 @@ rna-seq-learning/
 ## Status
 
 - [x] Phase 1: environment setup
-- [ ] Phase 1: QC + trimming
+- [x] Phase 1: QC + trimming
 - [ ] Phase 1: alignment (STAR)
 - [ ] Phase 1: quantification (Salmon)
 - [ ] Phase 1: DESeq2 differential expression
