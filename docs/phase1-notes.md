@@ -22,7 +22,16 @@ GitHub writeup for this phase.
 
 ### 2. Trimming
 
--
+Used fastp with default quality filtering and `--detect_adapter_for_pe` (paired-end auto adapter detection), minimum length 25bp.
+
+| Sample | Condition | Reads passed filter | % passed | Duplication rate |
+|---|---|---|---|---|
+| GSM461177 | Untreated | 20,768,436 | ~98.2% | 13.2% |
+| GSM461178 | Untreated | 20,875,258 | ~85.3% | 8.8% |
+| GSM461180 | Treated | 21,057,766 | ~85.9% | 4.8% |
+| GSM461181 | Treated | 24,678,922 | ~98.3% | 14.0% |
+
+**Observation:** GSM461177 and GSM461181 showed high Read2 quality pre-trimming (Q20 ~92-95%), while GSM461178 and GSM461180 showed noticeably degraded Read2 quality (Q20 ~77%), leading to a much higher proportion of reads failing the quality filter (~28% vs ~2-3%). This split does **not** correlate with treatment condition (178 is untreated, 180 is treated), suggesting a batch, lane, or flow-cell effect rather than a biological one. fastp's filtering handled this cleanly — all samples still retained the large majority of reads. Worth keeping in mind during downstream QC (post-alignment mapping rates) to see if this pattern persists.
 
 ### 3. STAR indexing + alignment
 
