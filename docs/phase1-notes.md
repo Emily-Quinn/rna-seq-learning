@@ -43,6 +43,18 @@ Used fastp with default quality filtering and `--detect_adapter_for_pe` (paired-
 
 **Observation:** GSM461177 and GSM461181 showed high Read2 quality pre-trimming (Q20 ~92-95%), while GSM461178 and GSM461180 showed noticeably degraded Read2 quality (Q20 ~77%), leading to a much higher proportion of reads failing the quality filter (~28% vs ~2-3%). This split does **not** correlate with treatment condition (178 is untreated, 180 is treated), suggesting a batch, lane, or flow-cell effect rather than a biological one. fastp's filtering handled this cleanly — all samples still retained the large majority of reads. Worth keeping in mind during downstream QC (post-alignment mapping rates) to see if this pattern persists.
 
+### Genome download
+
+Initially attempted Ensembl release-116 (BDGP6.54) — URLs returned 404s across multiple naming patterns, including the `current_gtf` stable symlink path. Investigation revealed Ensembl underwent a major FTP restructuring in June 2026, retiring the old species-name-based FTP structure in favor of a new GCA/GCF-based structure at ftp.ebi.ac.uk.
+
+Switched to **FlyBase** instead (the primary source for Drosophila annotations) — much simpler and more stable. Used release **r6.69**:
+- Genome: `dmel-all-chromosome-r6.69.fasta.gz` (~146Mb uncompressed)
+- Annotation: `dmel-all-r6.69.gtf.gz` (~79Mb uncompressed)
+
+**Follow-up check:** also verified Ensembl's new GCA-based mirror (`ftp.ebi.ac.uk/pub/ensemblorganisms/GCA/000/001/215/4/flybase/2022_07/`) — it does host a genome + GTF for this assembly, with files dated as recently as April/May 2026, so it's an actively maintained mirror, not abandoned. However, the `2022_07` folder label reflects when Ensembl started tracking this particular annotation lineage, not necessarily which exact FlyBase release number the current file content corresponds to — there's no easy way to confirm it matches r6.69 specifically without downloading and inspecting the GTF header. Since we already had a confirmed, version-matched genome+GTF pair directly from FlyBase (the authoritative source), we stuck with that rather than switch.
+
+Lesson: always verify genome/GTF download URLs before scripting a pipeline around them, and when using mirrors, be aware that folder/version labels don't always guarantee content currency — going to the primary source eliminates that ambiguity entirely.
+
 ### 3. STAR indexing + alignment
 
 -
