@@ -10,7 +10,13 @@
 #
 # If a specific package still fails to resolve, try creating the env first,
 # then installing that one package with `CONDA_SUBDIR=osx-64 conda install -n rna-seq <pkg>`.
-
+#
+# STAR version pin:
+# STAR 2.7.11b (bioconda) has a version-specific bug where alignment silently
+# reports "Number of input reads: 0" despite a clean "finished successfully"
+# exit and valid input files. Confirmed via manual single-read test:
+# 2.7.11b -> 0 reads, 2.7.10b -> 1 read (correct), same input/index/command.
+# Pinning to 2.7.10b until this is resolved upstream.
 name: rna-seq
 channels:
   - bioconda
@@ -20,7 +26,7 @@ dependencies:
   - fastqc
   - fastp
   - multiqc
-  - star
+  - star=2.7.10b
   - samtools
   - deeptools
   - salmon
