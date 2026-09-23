@@ -122,6 +122,20 @@ committed repo version — always diff against GitHub when a script behaves
 unexpectedly, and platform-specific tool behavior (macOS zcat vs GNU zcat)
 is a real, non-obvious source of bugs worth documenting for future-you.
 
+**Open question / honest caveat:** The original full-pipeline runs that
+first surfaced the "0 input reads" failure used real gzipped FASTQs with
+`--readFilesCommand zcat`. Since macOS's built-in `zcat` doesn't handle
+`.gz` correctly, it's unclear whether that alone could have contributed to
+those early silent failures, or whether the 2.7.11b bug alone fully
+explains them — a broken `zcat` pipe would normally be expected to crash
+loudly (as it later did on 2.7.10b before switching to `gzip -dc`), not
+exit cleanly with 0 reads, so the exact interaction isn't fully resolved.
+This doesn't undermine the root-cause finding: the controlled comparison
+test that isolated the 2.7.11b bug used an uncompressed file with no
+`--readFilesCommand` at all, so it stands independently of this open
+question. Flagging it here in the interest of accurate documentation
+rather than overstating certainty.
+
 ### 4. Post-alignment QC
 
 -
