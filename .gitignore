@@ -23,6 +23,8 @@ genome_index/
 Log.out
 Log.progress.out
 _STARgenome/
+star_index_minimal/
+data/genome/*transcriptome*.fasta
 
 # QC report directories (regenerate on demand)
 *qualimap-report/

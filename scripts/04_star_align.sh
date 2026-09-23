@@ -18,7 +18,7 @@ STAR \
   --genomeDir "$GENOME_DIR" \
   --readFilesIn "$R1" "$R2" \
   --outFileNamePrefix "$OUT_DIR/${SAMPLE}." \
-  --readFilesCommand zcat \
+  --readFilesCommand "gzip -dc" \
   --outSAMtype BAM Unsorted \
   --quantTranscriptomeBan Singleend \
   --outFilterType BySJout \
