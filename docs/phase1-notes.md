@@ -57,7 +57,70 @@ Lesson: always verify genome/GTF download URLs before scripting a pipeline aroun
 
 ### 3. STAR indexing + alignment
 
--
+**Problem:** Every STAR alignment attempt (both x86_64/Rosetta and native
+arm64 builds of STAR 2.7.11b) completed with a "finished successfully"
+status and no error output, but `Log.final.out` reported
+`Number of input reads: 0` — even against known-good, previously-indexed
+genome data and valid trimmed FASTQ files.
+
+**Ruled out systematically, one variable at a time:**
+- Architecture (x86_64 Rosetta vs. native arm64) — both failed identically
+- Genome index version/build — rebuilt from scratch, same result
+- File location / iCloud Drive sync interference
+- File format (verified FASTQ integrity, tried compressed and uncompressed)
+- GTF annotation processing
+- Memory pressure / OOM kill — confirmed via `echo $?` returning 0
+  (clean exit, not a signal-9 kill) and `vm_stat` showing healthy free
+  memory at time of run
+
+**Root cause found:** Installed STAR 2.7.10b under `CONDA_SUBDIR=osx-64`
+(Rosetta) as a controlled comparison against the same input file, same
+index, same command structure. Result:
+- STAR 2.7.11b → `Number of input reads: 0`
+- STAR 2.7.10b → `Number of input reads: 1` (correct)
+
+This isolated the bug to the STAR 2.7.11b bioconda build specifically.
+
+**Fix:** Pinned `star=2.7.10b` in `environment.yml`, rebuilt the genome
+index (FlyBase r6.69, `--sjdbOverhang 35` matching confirmed 36bp trimmed
+read length across all four samples, `--genomeSAindexNbases 11`) under
+the 2.7.10b environment.
+
+**Second bug found during the real 4-sample run:** the local copy of
+`04_star_align.sh` had drifted from the GitHub version — missing
+`--readFilesCommand zcat`, `--quantTranscriptomeBan Singleend`, and
+`--quantMode TranscriptomeSAM`. Without the read-files-command flag, STAR
+tried to parse gzipped FASTQ as raw text and failed outright.
+
+**Third gotcha:** switching in `zcat` on macOS still failed — Apple's
+built-in `zcat` doesn't handle `.gz` the way GNU zcat does, throwing a
+"can't stat ...gz.Z" error. Switched to `--readFilesCommand "gzip -dc"`,
+which is portable across GNU/BSD/macOS gzip implementations.
+
+**Result — real 4-sample alignment (all under STAR 2.7.10b, ~6-8 min/sample):**
+
+| Sample | Input reads | Uniquely mapped % | Multi-mapped % | Splices |
+|---|---|---|---|---|
+| GSM461177 | 10,384,218 | 82.54% | 7.72% | 1,026,084 |
+| GSM461178 | 10,437,629 | 82.68% | 6.49% | 1,080,477 |
+| GSM461180 | 10,528,883 | 79.62% | 6.72% | 986,897 |
+| GSM461181 | 12,339,461 | 84.97% | 6.35% | 1,317,752 |
+
+All four samples show healthy alignment stats (80%+ uniquely mapped,
+6-8% multi-mapped — normal ranges for RNA-seq). Interesting note: despite
+177/181 showing much higher Read2 quality after trimming (~98% Q20-passing)
+vs. 178/180 (~77-85%), all four landed in a similar uniquely-mapped range —
+suggests the trimming step successfully normalized quality differences
+before alignment.
+
+**Lesson learned:** A tool reporting a clean success status is not proof
+the tool worked correctly — version-specific silent bugs in bioinformatics
+packages are a real failure mode. Systematic single-variable testing
+(architecture → index → files → GTF → memory → version) is what actually
+isolates them. Also: local script copies can silently drift from the
+committed repo version — always diff against GitHub when a script behaves
+unexpectedly, and platform-specific tool behavior (macOS zcat vs GNU zcat)
+is a real, non-obvious source of bugs worth documenting for future-you.
 
 ### 4. Post-alignment QC
 
