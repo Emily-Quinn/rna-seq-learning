@@ -138,7 +138,42 @@ rather than overstating certainty.
 
 ### 4. Post-alignment QC
 
--
+Ran `05_post_align_qc.sh` on all four samples: sorted/indexed BAMs,
+`samtools flagstat`, and qualimap `bamqc` + `rnaseq` modules.
+
+**Percent reads mapped to exons (qualimap rnaseq):**
+
+| Sample | % mapped to exons |
+|---|---|
+| GSM461177 | 96.48% |
+| GSM461178 | 97.03% |
+| GSM461180 | 96.72% |
+| GSM461181 | 97.31% |
+
+Consistently high exonic mapping (96-97%) across all four samples — a good
+sign of clean poly-A-selected/enriched RNA-seq library with minimal
+genomic DNA contamination or intronic noise.
+
+**samtools flagstat summary:**
+
+| Sample | Primary reads | Properly paired | Singletons |
+|---|---|---|---|
+| GSM461177 | 18,745,568 | 100% | 0 |
+| GSM461178 | 18,614,370 | 100% | 0 |
+| GSM461180 | 18,181,054 | 100% | 0 |
+| GSM461181 | 22,537,848 | 100% | 0 |
+
+Note: flagstat's "100% mapped" reflects that STAR's default BAM output
+only includes successfully mapped reads (unmapped reads are excluded
+unless `--outSAMunmapped Within` is set) — it is not the true overall
+mapping rate. The honest figure is the uniquely-mapped % from
+`Log.final.out` in the alignment step (79.6-85.0% across samples).
+
+**Qualimap warnings:** each report flagged a long list of read-mapped
+chromosomes/scaffolds "not found in annotations." This is expected —
+FlyBase's genome FASTA includes many small unplaced/unmapped scaffolds
+present in the sequence but absent from the GTF gene models. Harmless,
+does not affect exonic mapping stats.
 
 ### 5. Salmon quantification
 

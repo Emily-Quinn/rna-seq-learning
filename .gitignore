@@ -6,6 +6,7 @@
 *.bam
 *.bai
 *.sam
+*.flagstat
 
 # Genome/annotation reference files (large, download separately)
 *.fa
