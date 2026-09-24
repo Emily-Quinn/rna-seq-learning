@@ -58,7 +58,7 @@ rna-seq-learning/
 - [x] Phase 1: QC + trimming
 - [x] Phase 1: alignment (STAR)
 - [x] Phase 1: post-alignment QC
-- [ ] Phase 1: quantification (Salmon)
+- [x] Phase 1: quantification (Salmon)
 - [ ] Phase 1: DESeq2 differential expression
 - [ ] Phase 1: functional analysis
 - [ ] Phase 1: writeup
