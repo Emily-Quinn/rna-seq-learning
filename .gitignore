@@ -32,6 +32,8 @@ data/genome/*transcriptome*.fasta
 *.SJ.out.tab
 data/genome/star_index*/
 *.bw
+*.fai
+data/quant/
 
 # QC report directories (regenerate on demand)
 *qualimap-report/

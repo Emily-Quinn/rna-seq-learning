@@ -198,7 +198,50 @@ will come from Salmon quantification + DESeq2 in later steps.
 
 ### 5. Salmon quantification
 
--
+**Bug found:** `07_salmon_quant.sh` had a literal `{build-transcriptome|quant}`
+inside its bash parameter-expansion usage message
+(`${1:?Usage: ... {build-transcriptome|quant} ...}`). Bash's `${1:?...}`
+expansion terminates at the first unescaped `}`, so the literal brace in
+the usage text closed the expansion early, leaving `...}` to be
+interpreted as a separate command — `command not found`. Fixed by
+removing the literal braces from the usage message.
+
+**Ran quantification (alignment-based mode, `-a`) against the
+`Aligned.toTranscriptome.out.bam` files from the STAR alignment step:**
+
+| Sample | Total fragments | % quantified | Equivalence classes |
+|---|---|---|---|
+| GSM461177 | 8,696,439 | 100% | 36,681 |
+| GSM461178 | 8,707,956 | 100% | 35,652 |
+| GSM461180 | 8,460,054 | 100% | 36,072 |
+| GSM461181 | 10,553,408 | 100% | 37,255 |
+
+**Note on multimapper scoring:** Salmon warned that no alignment in the
+STAR BAMs carries an `AS` (alignment score) tag, so ambiguous/multi-mapped
+reads are apportioned equally across their possible transcript
+placements (weighted only by effective transcript length), rather than by
+per-alignment quality. This is a known limitation of alignment-based
+Salmon quantification against STAR output (vs. Salmon's native
+quasi-mapping mode) — not a bug, but worth noting as a methodological
+caveat.
+
+**Spot-check: pasilla transcript quantification.** Summed TPM across all
+18 annotated pasilla (ps) transcript isoforms (FBgn0261552, per FlyBase),
+comparing conditions:
+
+| Sample | Condition | Summed TPM (all 18 pasilla transcripts) |
+|---|---|---|
+| GSM461177 | untreated | ~243.0 |
+| GSM461178 | untreated | ~179.1 |
+| GSM461180 | treated | ~52.7 |
+| GSM461181 | treated | ~50.0 |
+
+~3.6-4.6x reduction in pasilla expression in treated vs. untreated
+samples — consistent with the visual IGV coverage difference observed
+earlier, and a strong quantitative sanity check ahead of the full DESeq2
+analysis. Several isoforms (e.g. FBtr0111027, FBtr0111028, FBtr0111031)
+show 0 TPM across all four samples — not every annotated splice variant
+is expressed in this tissue/dataset.
 
 ### 6. DESeq2 differential expression
 

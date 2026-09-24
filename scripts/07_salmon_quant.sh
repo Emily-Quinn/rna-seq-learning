@@ -9,7 +9,7 @@
 #     ./07_salmon_quant.sh quant <transcriptome_fasta> <toTranscriptome.bam> <out_dir>
 set -euo pipefail
 
-MODE=${1:?Usage: 07_salmon_quant.sh {build-transcriptome|quant} ...}
+MODE=${1:?Usage: 07_salmon_quant.sh build-transcriptome or quant ...}
 
 case "$MODE" in
   build-transcriptome)
