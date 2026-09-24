@@ -175,6 +175,27 @@ FlyBase's genome FASTA includes many small unplaced/unmapped scaffolds
 present in the sequence but absent from the GTF gene models. Harmless,
 does not affect exonic mapping stats.
 
+### Bonus: Visual confirmation of pasilla knockdown (IGV)
+
+Generated bigWig coverage tracks (`06_bigwig.sh`, BPM-normalized) for all
+four samples and loaded them into IGV Web (igv.org/app) alongside the
+FlyBase r6.69 GTF, navigated to the pasilla (ps) locus itself
+(FBgn0261552, 3R:9,417,940-9,455,500). All four tracks were set to a
+shared data range (0-15) for direct visual comparability, and renamed
+per sample condition (untreated/treated) per GEO metadata for GSE18508.
+
+Result: both untreated/control samples (GSM461177, GSM461178) show
+clearly higher pasilla coverage than both treated/RNAi-knockdown samples
+(GSM461180, GSM461181) — a clean visual confirmation that the RNAi
+knockdown worked as expected, ahead of formal differential expression
+testing.
+
+![pasilla locus coverage](images/pasilla_locus_coverage.png)
+
+Note: this is a qualitative sanity check, not a statistical result — the
+actual fold-change and significance for pasilla (and every other gene)
+will come from Salmon quantification + DESeq2 in later steps.
+
 ### 5. Salmon quantification
 
 -
