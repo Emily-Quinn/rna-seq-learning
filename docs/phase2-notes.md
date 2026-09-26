@@ -3,7 +3,7 @@
 ## Setup
 
 - Date started:
-- Discovery cluster account/access notes:
+- Explorer cluster account/access notes:
 - Modules available vs. built manually:
 
 ## Dataset

@@ -26,7 +26,7 @@ expression result.
 **Total: ~3–5 focused days**, realistically spread over 1–2 weeks around
 other commitments.
 
-## Phase 2 — Full-scale pipeline (Northeastern HPCC / Discovery)
+## Phase 2 — Full-scale pipeline (Northeastern HPCC / Explorer)
 
 Goal: repeat the identical pipeline against a real human dataset and full
 GRCh38 genome, using proper cluster resource allocation (SLURM batch jobs,
@@ -34,7 +34,7 @@ not interactive laptop runs).
 
 | Step | Task | Notes |
 |---|---|---|
-| 1 | Get Discovery account access sorted, load required modules or build a conda env on cluster | Check if STAR/Salmon/samtools already exist as modules — saves reinstall time |
+| 1 | Get Explorer account access sorted, load required modules or build a conda env on cluster | Check if STAR/Salmon/samtools already exist as modules — saves reinstall time |
 | 2 | Write SLURM batch scripts for each stage (this is new vs. Phase 1) | Needs `#SBATCH` headers: partition, time, mem, cpus |
 | 3 | Download/index GRCh38 (request enough mem: 32–64GB) | This step alone can take a few hours |
 | 4 | Choose + download a real human dataset with a clear 2-group comparison | e.g. a public GEO dataset with disease vs. healthy or treated vs. untreated |

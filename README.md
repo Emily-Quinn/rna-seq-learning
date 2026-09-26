@@ -2,7 +2,7 @@
 
 A hands-on implementation of a standard RNA-seq differential expression pipeline,
 built in two phases: a small-scale run on a laptop, then a full-scale run on
-Northeastern's HPCC (Discovery cluster) against the real human genome.
+Northeastern's HPCC (Explorer cluster) against the real human genome.
 
 Pipeline steps and reference commands are adapted from the
 [CebolaLab/RNA-seq](https://github.com/CebolaLab/RNA-seq) tutorial, which covers:
@@ -17,7 +17,7 @@ compute per sample — not realistic on a 16GB M2 laptop. So:
 - **Phase 1 (laptop)** proves out every tool and command on a small genome
   (Drosophila) where indexing/alignment finishes in minutes, not hours.
 - **Phase 2 (HPCC)** re-runs the *same* pipeline against a real human dataset,
-  at full scale, using Discovery's compute/memory allocation.
+  at full scale, using Explorer's compute/memory allocation.
 
 ## Dataset
 
