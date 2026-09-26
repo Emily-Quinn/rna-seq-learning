@@ -36,6 +36,10 @@ colData <- data.frame(
   condition = factor(samples$condition)
   # add: batch = factor(samples$batch)  if you have a batch/donor covariate
 )
+# Explicitly set "untreated" as the reference level, so results read as
+# "treated vs. untreated" (the conventional framing for a knockdown
+# experiment) rather than relying on R's alphabetical default.
+colData$condition <- relevel(colData$condition, ref = "untreated")
 
 dds <- DESeqDataSetFromTximport(
   counts.imported,

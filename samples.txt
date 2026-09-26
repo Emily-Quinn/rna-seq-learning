@@ -1,0 +1,5 @@
+sample_id	path	condition
+GSM461177	data/quant/GSM461177/quant.sf	untreated
+GSM461178	data/quant/GSM461178/quant.sf	untreated
+GSM461180	data/quant/GSM461180/quant.sf	treated
+GSM461181	data/quant/GSM461181/quant.sf	treated

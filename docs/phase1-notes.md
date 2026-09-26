@@ -245,15 +245,124 @@ is expressed in this tissue/dataset.
 
 ### 6. DESeq2 differential expression
 
-- Coefficient tested:
-- Number of significant genes (padj<0.05):
-- Number of significant genes (padj<0.05, |log2FC|>2):
-- Key plots: (embed pca_plot.png, volcano_plot.png, ma_plot.png here)
+- **Coefficient tested:** `condition_treated_vs_untreated` (explicitly
+  releveled with `untreated` as reference, rather than relying on R's
+  alphabetical default, so results read intuitively: positive log2FC =
+  higher in treated, negative = lower in treated/knocked down)
+- **Genes tested (nonzero counts):** 12,662
+- **Number of significant genes (padj<0.05):** 679
+- **Number of significant genes (padj<0.05, |log2FC|>2):** 41
+- Up in treated: 324 (2.6%) — Down in treated: 355 (2.8%)
+- Low-count filtered: 4,568 (36%)
+- **DESeq2 version:** 1.50.2
+
+**Pasilla itself confirmed in the results — the key validation of the
+entire pipeline:**
+
+| Gene | baseMean | log2FoldChange | pvalue | padj |
+|---|---|---|---|---|
+| FBgn0261552 (pasilla) | 3409.8 | -2.09 | 9.85e-74 | 1.33e-70 |
+
+Pasilla ranks in the **top 10 most significant genes by padj** — expected,
+since it was the gene directly targeted by RNAi knockdown in this
+experiment. A log2FC of -2.09 corresponds to roughly a 4.25-fold reduction
+in treated samples, closely matching the ~3.6-4.6x reduction independently
+estimated from raw Salmon TPM summation earlier, and consistent with the
+visual IGV coverage difference observed at the pasilla locus. Three
+independent methods (visual coverage, manual TPM calculation, and formal
+DESeq2 statistical modeling) now all agree — strong end-to-end validation
+that the pipeline, from raw reads through differential expression, is
+producing correct, trustworthy results.
+
+**Key plots:** see `dge/results/` — `pca_plot.png` (sample clustering by
+condition), `volcano_plot.png`, `ma_plot.png`, `pvalue_hist.png`,
+`fdr_hist.png`.
+
+**Setup note:** created the `samples.txt` sample sheet and `tx2gene.txt`
+transcript-to-gene mapping (generated from the FlyBase GTF — see caveat
+below) manually, since these aren't produced automatically by earlier
+pipeline steps.
+
+**Gotcha:** initial `tx2gene.txt` generation assumed a standard GTF
+`feature_type == "transcript"` field, which returned 0 matches — FlyBase's
+GTF uses `mRNA` (and non-coding equivalents like `ncRNA`, `miRNA`, `tRNA`,
+etc.) rather than a generic `transcript` feature type. Fixed by matching
+on the presence of the `transcript_id` attribute directly, regardless of
+feature type, then deduplicating — correctly captured 35,738 of the
+35,747 transcripts in the transcriptome fasta.
 
 ## What surprised me / what I'd do differently
 
--
+- **Silent failures were the hardest bugs to catch, and the most
+  instructive.** Both major bugs in this project (the STAR 2.7.11b
+  0-reads bug, and the bash literal-brace bug in `07_salmon_quant.sh`)
+  produced no obvious error — one exited "successfully" with zero reads,
+  the other threw a generic `command not found` that had nothing
+  semantically to do with the actual problem. Lesson: verify tool output
+  content, not just exit codes or "success" messages.
+- **Local script copies can silently drift from the committed repo
+  version** — this cost real debugging time on the STAR alignment step
+  (missing `--readFilesCommand`, `--quantMode`, etc. in a stale local
+  copy). Next time: diff against GitHub earlier when a script behaves
+  unexpectedly, rather than assuming the local copy is authoritative.
+- **macOS vs. GNU tool behavior is a real, recurring hazard** — hit this
+  twice (macOS `zcat` failing on `.gz` files; would not be surprised if
+  more Apple-vs-GNU tool differences show up in Phase 2 if switching
+  between local and HPCC environments).
+- **GTF annotation conventions are not standardized across sources** —
+  assumed a generic `feature_type == "transcript"` field when generating
+  `tx2gene.txt`; FlyBase actually uses `mRNA`/`ncRNA`/etc. Would check a
+  new annotation's actual feature-type vocabulary first next time,
+  rather than assuming GENCODE/Ensembl-style conventions apply.
+- **Cross-validating a single, biologically meaningful result (pasilla
+  itself) across three independent methods** — visual (IGV), manual
+  (Salmon TPM), and statistical (DESeq2) — was a genuinely useful
+  practice. It caught nothing wrong this time, but it's the kind of
+  check that would have caught a pipeline error if one existed, and it
+  makes the final result far more convincing than any single method
+  alone.
+- **On tooling choice:** third-party bioinformatics agent skill libraries
+  (e.g. ClawBio) exist that could automate much of this pipeline through
+  pre-built, tested scripts. I deliberately ran each step manually instead
+  — the goal of this project was to build hands-on familiarity with each
+  tool (STAR, Salmon, DESeq2) and their failure modes, not just to
+  produce a result. The debugging process itself (STAR version bug,
+  script drift, macOS/GNU tool differences, GTF format assumptions) was
+  the actual learning experience, and is exactly what a more automated
+  approach would have abstracted away.
+- **What I'd do differently:** set up `samples.txt` and `tx2gene.txt`
+  generation earlier and more systematically — these were somewhat
+  improvised at the end rather than planned as explicit pipeline steps
+  with their own script, unlike steps 1-7 which each had a dedicated
+  `.sh` file.
 
 ## Comparison prep for Phase 2
 
-- Runtime for each stage (for later comparison against HPCC):
+- **Runtime for each stage (Phase 1, laptop, 4 samples, M2 Rosetta):**
+  - STAR genome indexing: ~70 seconds
+  - STAR alignment: ~6-8 minutes per sample (~28 min total, 4 samples)
+  - Post-alignment QC (qualimap bamqc + rnaseq): several minutes per
+    sample (qualimap noticeably slower/more memory-hungry than STAR
+    itself)
+  - Salmon quantification (alignment-based mode): under 30 seconds per
+    sample — fast, since re-estimating from existing alignments rather
+    than doing its own mapping
+  - DESeq2 (all 4 samples, whole pipeline from tximport through plots):
+    well under a minute
+- **Total wall-clock time, indexing through DESeq2:** roughly 45-60
+  minutes of actual compute, spread across a couple of days of real
+  calendar time due to debugging detours (STAR version bug, script
+  drift, macOS zcat, tx2gene GTF format, bash brace bug).
+- ****What to watch for at human/GRCh38 scale (Northeastern Explorer
+  HPC, SLURM-based):** genome indexing alone is expected to take hours
+  rather than seconds (30GB+ RAM requirement per the project README);
+  alignment per sample will likely be the dominant cost given ~20x
+  larger genome; qualimap and DESeq2 memory/runtime should scale more
+  gently since gene/transcript counts don't grow as fast as genome
+  size. New considerations vs. Phase 1: SLURM job scripts (`#SBATCH`
+  headers for partition/time/mem/cpus) instead of interactive terminal
+  runs, module system vs. conda (check if STAR/Salmon/samtools already
+  exist as HPC modules before reinstalling), and queue wait times as a
+  new source of calendar-time delay unrelated to actual compute time.
+
+
