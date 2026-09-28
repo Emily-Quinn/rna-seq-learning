@@ -8,8 +8,16 @@
 
 ## Dataset
 
-- GEO/SRA accession:
-- Comparison being tested:
+- GEO/SRA accession: GSE52778 ("airway" dataset), SRP033351 / PRJNA229998
+- Comparison being tested: dexamethasone-treated vs. untreated, 4 paired
+  human airway smooth muscle cell lines (8 samples total)
+- Design: paired by cell line/donor (N61311, N052611, N080611, N061011)
+  — plan to use `~cell + treatment` (or `~donor + condition`) as the
+  DESeq2 design formula, controlling for donor effects, per CebolaLab's
+  tutorial recommendation for paired designs
+- Read lengths vary by sample (87-126bp per run) — unlike Phase 1's
+  uniform 36bp, will need per-sample or max-based `--sjdbOverhang` for
+  STAR indexing
 
 ## SLURM notes
 

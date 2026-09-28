@@ -27,8 +27,25 @@ compute per sample — not realistic on a 16GB M2 laptop. So:
 used in the official Bioconductor DESeq2 vignette, so there's a strong
 reference to check work against.
 
-**Phase 2:** TBD — a public human RNA-seq dataset from GEO/SRA with a clear
-two-group comparison (chosen once Phase 1 is complete).
+**Phase 2:** [GSE52778](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE52778)
+(the "airway" dataset) — four primary human airway smooth muscle cell
+lines, each with a dexamethasone-treated and untreated sample (8 samples
+total, paired design). SRA Study: SRP033351, BioProject: PRJNA229998.
+This is the standard human dataset used in DESeq2/tximport teaching
+materials (the Bioconductor `airway` package), giving a reference result
+to validate against — same rationale as Phase 1's pasilla choice.
+Source: Himes et al. 2014, PLoS One, PMID 24926665.
+
+| Run (SRR) | GSM | Cell line | Condition |
+|---|---|---|---|
+| SRR1039508 | GSM1275862 | N61311 | untreated |
+| SRR1039509 | GSM1275863 | N61311 | treated (dex) |
+| SRR1039512 | GSM1275866 | N052611 | untreated |
+| SRR1039513 | GSM1275867 | N052611 | treated (dex) |
+| SRR1039516 | GSM1275870 | N080611 | untreated |
+| SRR1039517 | GSM1275871 | N080611 | treated (dex) |
+| SRR1039520 | GSM1275874 | N061011 | untreated |
+| SRR1039521 | GSM1275875 | N061011 | treated (dex) |
 
 ## Repo structure
 
