@@ -79,7 +79,7 @@ rna-seq-learning/
 - [x] Phase 1: DESeq2 differential expression
 - [ ] Phase 1: functional analysis
 - [ ] Phase 1: writeup
-- [ ] Phase 2: HPCC environment / module setup
+- [x] Phase 2: HPCC environment / module setup
 - [ ] Phase 2: full human genome index
 - [ ] Phase 2: full pipeline re-run
 - [ ] Phase 2: writeup + comparison to Phase 1
