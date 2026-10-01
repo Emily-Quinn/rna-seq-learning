@@ -23,7 +23,7 @@
 
 ## Setup
 
-- Date started: (fill in your actual date)
+- Date started: October 1, 2026
 - Explorer cluster account/access notes: already had access; logged in via
   `ssh user@login.explorer.northeastern.edu`
 - Storage layout: git repo cloned to `~/rna-seq-learning` (home, 75GB
