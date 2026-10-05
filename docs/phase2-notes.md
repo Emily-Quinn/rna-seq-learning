@@ -72,6 +72,51 @@ didn't show as registered but `conda env create` still refused to
 overwrite (`CondaValueError: prefix already exists`). Fixed with
 `conda env remove -n rna-seq` before rebuilding cleanly.
 
+## Dataset download (airway, GSE52778)
+
+Downloaded all 8 samples via SLURM batch job (`scripts/08_download_airway.sh`)
+using `prefetch` + `fasterq-dump` from `sra-tools`.
+
+**Critical bug found: `--split-files` silently produces mismatched R1/R2
+pairs.** After downloading all 8 samples, verified R1/R2 read-count parity
+for each (`zcat file.fastq.gz | wc -l`, divided by 4). **4 of 8 samples
+(50%) had genuinely mismatched R1/R2 read counts** — not a download
+corruption, but a real property of the underlying SRA data: these samples
+contain a meaningful fraction of reads with a missing mate (likely a
+technical artifact from how the original sequencing run or SRA deposit
+handled certain reads). `--split-files` writes R1 and R2 independently
+without enforcing synchronized pairing, silently producing files that
+*look* valid (correct FASTQ format, consistent read length) but would
+have fed misaligned read pairs directly into STAR — a serious,
+hard-to-detect correctness bug that would not have thrown any error.
+
+| Sample | Original R1 reads | Original R2 reads | Mismatch? |
+|---|---|---|---|
+| SRR1039508 | 22,935,521 | 22,935,521 | No |
+| SRR1039509 | 21,155,707 | 21,155,707 | No |
+| SRR1039512 | 28,136,282 | 28,136,282 | No |
+| SRR1039513 | 16,823,088 | 43,356,464 | **Yes** |
+| SRR1039516 | 27,298,970 | 30,043,024 | **Yes** |
+| SRR1039517 | 34,298,260 | 34,298,260 | No |
+| SRR1039520 | 21,275,888 | 34,575,286 | **Yes** |
+| SRR1039521 | 23,487,860 | 41,152,075 | **Yes** |
+
+**Fix:** re-downloaded the 4 affected samples using `--split-3` instead
+of `--split-files`. `--split-3` guarantees R1/R2 contain only genuinely
+paired reads (matched counts), and writes any unpaired/orphan reads to a
+separate third file (`<SRR>.fastq`, no `_1`/`_2` suffix) rather than
+silently corrupting the main pair files. Verified all 8 samples show
+matched R1/R2 counts after the fix. Orphan-read files and `.sra` cache
+directories were deleted after successful FASTQ extraction to reclaim
+scratch space.
+
+**Lesson learned:** always verify R1/R2 read-count parity immediately
+after any SRA paired-end download, before trusting the data downstream —
+`--split-files` can silently produce corrupted pairing for a substantial
+fraction of real-world datasets (50% in this case), with no error message
+at any stage. `--split-3` should be the default choice for paired-end SRA
+downloads going forward, not `--split-files`.
+
 ## SLURM notes
 
 - Partition(s) used: `short` (default partition, 2-day time limit) for
