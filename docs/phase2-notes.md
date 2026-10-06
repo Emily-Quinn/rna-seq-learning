@@ -2,27 +2,6 @@
 
 ## Setup
 
-- Date started:
-- Explorer cluster account/access notes:
-- Modules available vs. built manually:
-
-## Dataset
-
-- GEO/SRA accession: GSE52778 ("airway" dataset), SRP033351 / PRJNA229998
-- Comparison being tested: dexamethasone-treated vs. untreated, 4 paired
-  human airway smooth muscle cell lines (8 samples total)
-- Design: paired by cell line/donor (N61311, N052611, N080611, N061011)
-  — plan to use `~cell + treatment` (or `~donor + condition`) as the
-  DESeq2 design formula, controlling for donor effects, per CebolaLab's
-  tutorial recommendation for paired designs
-- Read lengths vary by sample (87-126bp per run) — unlike Phase 1's
-  uniform 36bp, will need per-sample or max-based `--sjdbOverhang` for
-  STAR indexing
-
-## SLURM notes
-
-## Setup
-
 - Date started: October 1, 2026
 - Explorer cluster account/access notes: already had access; logged in via
   `ssh user@login.explorer.northeastern.edu`
@@ -62,7 +41,7 @@ worth connecting via campus wifi or VPN when running long interactive
 jobs if possible. More importantly: **running long jobs inside `tmux`
 solves this properly** — a tmux session persists on the login node
 independent of your SSH connection, so a dropped connection no longer
-kills the job; just reconnect and `tmux attach -s <session_name>` to
+kills the job; just reconnect and `tmux attach -t <session_name>` to
 pick back up exactly where you left off. Adopted this for all
 long-running interactive work for the rest of Phase 2.
 
@@ -71,6 +50,19 @@ broken partial `rna-seq` env directory on disk, which `conda env list`
 didn't show as registered but `conda env create` still refused to
 overwrite (`CondaValueError: prefix already exists`). Fixed with
 `conda env remove -n rna-seq` before rebuilding cleanly.
+
+## Dataset
+
+- GEO/SRA accession: GSE52778 ("airway" dataset), SRP033351 / PRJNA229998
+- Comparison being tested: dexamethasone-treated vs. untreated, 4 paired
+  human airway smooth muscle cell lines (8 samples total)
+- Design: paired by cell line/donor (N61311, N052611, N080611, N061011)
+  — plan to use `~cell + treatment` (or `~donor + condition`) as the
+  DESeq2 design formula, controlling for donor effects, per CebolaLab's
+  tutorial recommendation for paired designs
+- Read lengths: uniformly 63bp raw across all 8 samples (confirmed via
+  FastQC), 62bp after fastp trimming — will use `--sjdbOverhang 61` for
+  STAR genome indexing
 
 ## Dataset download (airway, GSE52778)
 
@@ -136,7 +128,19 @@ downloads going forward, not `--split-files`.
 (mirror the same sections as phase1-notes.md)
 
 ### 1. Pre-alignment QC
+
+Ran FastQC + MultiQC on all 8 raw samples (`scripts/09_airway_fastqc.sh`)
+via SLURM batch job on the `short` partition. All 8 samples at 63bp read
+length, ~48-50% GC, 46-57% duplication (expected/normal for RNA-seq —
+reflects highly-expressed transcripts, not a quality problem), no
+concerning FastQC flags.
+
 ### 2. Trimming
+
+Ran fastp trimming (`scripts/10_airway_trim.sh`) via SLURM batch job on
+the `short` partition. All 8 samples uniformly 62bp after trimming —
+will use `--sjdbOverhang 61` for STAR genome indexing.
+
 ### 3. STAR genome indexing (GRCh38)
 ### 4. STAR alignment
 ### 5. Post-alignment QC
