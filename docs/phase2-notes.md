@@ -142,6 +142,24 @@ the `short` partition. All 8 samples uniformly 62bp after trimming —
 will use `--sjdbOverhang 61` for STAR genome indexing.
 
 ### 3. STAR genome indexing (GRCh38)
+
+Downloaded GENCODE release 46 (GRCh38.p14) primary assembly genome fasta
+(~3.0GB) and comprehensive GTF annotation (~1.6GB uncompressed) directly
+from GENCODE's FTP. Verified: 194 sequences in the fasta (chromosomes +
+unplaced/unlocalized scaffolds), consistent with expected GRCh38 primary
+assembly structure.
+
+Built the STAR index (`scripts/11_airway_star_index.sh`) via SLURM batch
+job: 8 threads, 64GB RAM requested, 8-hour time limit. No
+`--genomeSAindexNbases` override (default 14 is correct for a genome
+this large, unlike Phase 1's small-genome override). `--sjdbOverhang 61`
+(62bp trimmed reads − 1).
+
+**Result:** completed successfully in ~56 minutes (20:00:55-20:56:35).
+Index size: 28GB on disk. STAR version confirmed 2.7.10b throughout (the
+correct pinned version — avoided the Phase 1 2.7.11b bug from the start
+this time).
+
 ### 4. STAR alignment
 ### 5. Post-alignment QC
 ### 6. Salmon quantification
