@@ -161,6 +161,30 @@ correct pinned version — avoided the Phase 1 2.7.11b bug from the start
 this time).
 
 ### 4. STAR alignment
+
+Aligned all 8 samples via SLURM job array (`scripts/12_airway_star_align.sh`,
+`--array=0-7`) — 8 threads/48GB RAM per task, up to 5 tasks running in
+parallel on the `short` partition (remaining 3 queued automatically until
+resources freed up).
+
+**Result:** all 8 samples aligned successfully, no errors.
+
+| Sample | Input reads | Uniquely mapped % | Multi-mapped % |
+|---|---|---|---|
+| SRR1039508 | 22,445,289 | 94.18% | 4.50% |
+| SRR1039509 | 20,517,083 | 93.85% | 4.28% |
+| SRR1039512 | 27,196,274 | 95.20% | 4.05% |
+| SRR1039513 | 16,091,880 | 95.29% | 3.89% |
+| SRR1039516 | 26,123,507 | 94.98% | 4.22% |
+| SRR1039517 | 32,871,045 | 95.48% | 3.90% |
+| SRR1039520 | 20,370,846 | 95.15% | 4.01% |
+| SRR1039521 | 22,416,611 | 95.18% | 3.98% |
+
+Notably higher and more consistent uniquely-mapped rates than Phase 1's
+pasilla data (79.6-85.0%) — expected, given GENCODE's human annotation is
+far more mature/comprehensive than FlyBase's, and this is well-established
+published data.
+
 ### 5. Post-alignment QC
 ### 6. Salmon quantification
 ### 7. DESeq2 differential expression
