@@ -186,6 +186,34 @@ far more mature/comprehensive than FlyBase's, and this is well-established
 published data.
 
 ### 5. Post-alignment QC
+
+Ran post-alignment QC via SLURM job array (`scripts/13_airway_post_align_qc.sh`,
+`--array=0-7`) — sort/index BAMs, `samtools flagstat`, qualimap `bamqc` +
+`rnaseq`. 4 threads/24GB RAM per task, up to 5 tasks in parallel on `short`.
+
+**Percent reads mapped to exons (qualimap rnaseq):**
+
+| Sample | % mapped to exons |
+|---|---|
+| SRR1039508 | 94.58% |
+| SRR1039509 | 94.65% |
+| SRR1039512 | 94.47% |
+| SRR1039513 | 95.21% |
+| SRR1039516 | 94.12% |
+| SRR1039517 | 94.42% |
+| SRR1039520 | 94.28% |
+| SRR1039521 | 95.04% |
+
+Tightly consistent (94.12-95.21%) across all 8 samples — comparable to
+Phase 1's pasilla results (96.48-97.31%), confirming high-quality,
+well-prepared RNA-seq libraries with minimal genomic DNA contamination.
+
+**samtools flagstat:** all 8 samples show ~100% properly paired reads;
+only SRR1039508 and SRR1039509 (the two samples never affected by the
+Phase 2 `--split-3` pairing fix) show a negligible number of singletons
+(61 and 72 respectively, out of tens of millions of reads) — expected,
+normal at this scale.
+
 ### 6. Salmon quantification
 ### 7. DESeq2 differential expression
 ### 8. Functional analysis
