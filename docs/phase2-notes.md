@@ -215,6 +215,41 @@ Phase 2 `--split-3` pairing fix) show a negligible number of singletons
 normal at this scale.
 
 ### 6. Salmon quantification
+
+Built transcriptome fasta from GENCODE v46 GTF (`scripts/14_airway_build_transcriptome.sh`)
+— 254,129 transcripts extracted (vs. Phase 1's 35,747 Drosophila
+transcripts), 456MB fasta.
+
+Quantified all 8 samples (`scripts/15_airway_salmon_quant.sh`, SLURM job
+array, all 8 tasks ran in parallel) against their
+`Aligned.toTranscriptome.out.bam` files from the STAR alignment step.
+All 8 completed quickly (a few minutes), no errors.
+
+**Spot-check: CRISPLD2 (ENSG00000103196), the glucocorticoid-responsive
+gene identified in the original Himes et al. 2014 publication this
+dataset comes from.** Summed TPM across its 6 known transcript isoforms (ENST00000262424, ENST00000563066, ENST00000564567, ENST00000566151,
+ENST00000566165, ENST00000566789):
+
+| Sample | Condition | Summed TPM (CRISPLD2) |
+|---|---|---|
+| SRR1039508 | untreated | 13.3 |
+| SRR1039512 | untreated | 14.9 |
+| SRR1039516 | untreated | 13.4 |
+| SRR1039520 | untreated | 14.3 |
+| SRR1039509 | treated (dex) | 107.8 |
+| SRR1039513 | treated (dex) | 106.7 |
+| SRR1039517 | treated (dex) | 44.7 |
+| SRR1039521 | treated (dex) | 104.3 |
+
+Untreated samples cluster tightly (~13-15 TPM); three of four treated
+samples show ~8x induction (~105-108 TPM), with the fourth (SRR1039517)
+showing a smaller but still clear ~3x induction — consistent with
+expected donor-to-donor variability, which the planned `~cell +
+treatment` paired DESeq2 design formula should properly account for.
+Strong independent confirmation the pipeline is producing correct,
+biologically meaningful results, matching the direction and gene
+identity reported in the original published study.
+
 ### 7. DESeq2 differential expression
 ### 8. Functional analysis
 
