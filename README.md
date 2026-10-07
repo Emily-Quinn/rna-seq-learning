@@ -57,6 +57,9 @@ rna-seq-learning/
 ├── samples.txt                <- Phase 1 sample sheet (sample, quant.sf path, condition)
 ├── tx2gene.txt                <- Phase 1 transcript-to-gene mapping (FlyBase r6.69)
 ├── phase2_sample_accessions.txt  <- Phase 2 sample sheet (SRR, GSM, cell line, condition)
+├── airway_samples.txt          <- Phase 2 DESeq2 sample sheet (cell_line + condition)
+├── airway_tx2gene.txt          <- Phase 2 transcript-to-gene mapping (GENCODE v46)
+├── check_crispld2.R            <- Phase 2 standalone CRISPLD2 result lookup
 ├── scripts/                   <- shell scripts, one per pipeline stage
 │   ├── 01_fastqc.sh
 │   ├── 02_trim.sh
@@ -75,8 +78,11 @@ rna-seq-learning/
 │   ├── 14_airway_build_transcriptome.sh  <- Phase 2: transcriptome fasta build
 │   └── 15_airway_salmon_quant.sh     <- Phase 2: Salmon quantification, SLURM job array
 ├── dge/
-│   ├── dge_analysis.R         <- DESeq2 + QC plots + functional analysis
-│   └── results/                <- Phase 1 DESeq2 output (plots, top-gene CSVs)
+│   ├── dge_analysis.R          <- Phase 1: DESeq2 + QC plots (pasilla, ~condition design)
+│   └── results/                 <- Phase 1 DESeq2 output (plots, top-gene CSVs)
+├── dge_airway/
+│   ├── dge_analysis_airway.R   <- Phase 2: DESeq2 + QC plots (airway, paired ~cell_line + condition design)
+│   └── results/                 <- Phase 2 DESeq2 output (plots, top-gene CSVs)
 └── docs/
     ├── phase1-notes.md        <- lab-notebook style log for the toy run
     ├── phase2-notes.md        <- lab-notebook style log for the HPCC run
@@ -95,7 +101,7 @@ rna-seq-learning/
 - [ ] Phase 1: writeup
 - [x] Phase 2: HPCC environment / module setup
 - [x] Phase 2: full human genome index
-- [ ] Phase 2: full pipeline re-run
+- [x] Phase 2: full pipeline re-run
 - [ ] Phase 2: writeup + comparison to Phase 1
 
 See [PLAN.md](PLAN.md) for the detailed checklist and time log.
