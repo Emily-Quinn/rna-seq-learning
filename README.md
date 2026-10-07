@@ -65,10 +65,15 @@ rna-seq-learning/
 │   ├── 05_post_align_qc.sh
 │   ├── 06_bigwig.sh
 │   ├── 07_salmon_quant.sh
-│   ├── 08_download_airway.sh     <- Phase 2: SRA download (prefetch + fasterq-dump)
-│   ├── 08b_redownload_sample.sh  <- Phase 2: single/batch re-download helper
-│   ├── 09_airway_fastqc.sh       <- Phase 2: FastQC + MultiQC via SLURM
-│   └── 10_airway_trim.sh         <- Phase 2: fastp trimming via SLURM
+│   ├── 08_download_airway.sh         <- Phase 2: SRA download (prefetch + fasterq-dump)
+│   ├── 08b_redownload_sample.sh      <- Phase 2: single/batch re-download helper
+│   ├── 09_airway_fastqc.sh           <- Phase 2: FastQC + MultiQC via SLURM
+│   ├── 10_airway_trim.sh             <- Phase 2: fastp trimming via SLURM
+│   ├── 11_airway_star_index.sh       <- Phase 2: GRCh38 STAR genome indexing via SLURM
+│   ├── 12_airway_star_align.sh       <- Phase 2: STAR alignment, SLURM job array
+│   ├── 13_airway_post_align_qc.sh    <- Phase 2: post-alignment QC, SLURM job array
+│   ├── 14_airway_build_transcriptome.sh  <- Phase 2: transcriptome fasta build
+│   └── 15_airway_salmon_quant.sh     <- Phase 2: Salmon quantification, SLURM job array
 ├── dge/
 │   ├── dge_analysis.R         <- DESeq2 + QC plots + functional analysis
 │   └── results/                <- Phase 1 DESeq2 output (plots, top-gene CSVs)
@@ -89,7 +94,7 @@ rna-seq-learning/
 - [ ] Phase 1: functional analysis
 - [ ] Phase 1: writeup
 - [x] Phase 2: HPCC environment / module setup
-- [ ] Phase 2: full human genome index
+- [x] Phase 2: full human genome index
 - [ ] Phase 2: full pipeline re-run
 - [ ] Phase 2: writeup + comparison to Phase 1
 
@@ -100,3 +105,7 @@ See [PLAN.md](PLAN.md) for the detailed checklist and time log.
 Pipeline steps adapted from [CebolaLab/RNA-seq](https://github.com/CebolaLab/RNA-seq)
 (Hannah Maude, Imperial College London). This repo documents an independent
 learning exercise working through that pipeline on new data.
+
+Debugging, documentation, and SLURM/HPC setup were done with assistance from
+Claude (Anthropic) as a pair-programming and troubleshooting aid throughout
+both phases.
