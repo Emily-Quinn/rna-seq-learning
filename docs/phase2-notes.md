@@ -251,6 +251,60 @@ biologically meaningful results, matching the direction and gene
 identity reported in the original published study.
 
 ### 7. DESeq2 differential expression
+
+Built `airway_samples.txt` (sample sheet with cell_line + condition) and
+`airway_tx2gene.txt` (transcript-to-gene mapping, 254,129 entries,
+extracted directly from GENCODE's GTF using the standard `transcript`
+feature type — simpler than Phase 1's FlyBase `mRNA`/non-coding-type
+workaround, since GENCODE uses standard GTF conventions).
+
+Ran DESeq2 (`dge_airway/dge_analysis_airway.R`) with a **paired design**
+(`~cell_line + condition`), controlling for donor-to-donor variability
+across the 4 matched cell lines — an upgrade from Phase 1's simpler
+`~condition` design, appropriate given airway's matched-pairs structure.
+Explicitly releveled `condition` with `untreated` as reference from the
+start (learned from Phase 1), so the coefficient
+`condition_treated_vs_untreated` was correct on the first run with no
+rediscovery needed.
+
+**Result:**
+
+| Metric | Value |
+|---|---|
+| Genes tested (nonzero counts) | 32,302 |
+| Significant (padj<0.05) | 3,574 |
+| Significant + large effect (padj<0.05, \|log2FC\|>2) | 198 |
+| Up in treated | 1,967 (6.1%) |
+| Down in treated | 1,607 (5%) |
+| Low-count filtered | 15,464 (48%) |
+
+3,574 significant genes is substantial but biologically plausible —
+dexamethasone (a glucocorticoid) has broad transcriptional effects across
+inflammation, metabolism, and immune signaling pathways, consistent with
+published literature on corticosteroid response.
+
+**CRISPLD2 (ENSG00000103196) confirmed — the key validation, matching
+both the manual TPM spot-check and the original publication's finding:**
+
+| Gene | baseMean | log2FoldChange | pvalue | padj |
+|---|---|---|---|---|
+| ENSG00000103196.12 (CRISPLD2) | 2995.6 | +2.61 | 4.13e-47 | 1.45e-44 |
+
+A log2FC of +2.61 corresponds to a ~6.1-fold increase in treated samples
+— closely matching the ~3-8x induction independently estimated from raw
+Salmon TPM summation earlier, and correctly **positive** (induced, not
+suppressed), matching the direction reported in Himes et al. 2014 — the
+original publication this dataset comes from. This closes the same
+validation loop as Phase 1 (visual/manual check + rigorous statistical
+model, both agreeing on direction and magnitude, both matching known
+published biology), this time at the scale of a real human RNA-seq
+dataset with donor-level replication.
+
+**Key plots:** see `dge_airway/results/` — `pca_plot.png` (colored by
+condition, shaped by cell line — check whether samples cluster primarily
+by treatment or by donor), `volcano_plot.png`, `ma_plot.png`,
+`pvalue_hist.png`, `fdr_hist.png`.
+
 ### 8. Functional analysis
 
 ## Phase 1 vs Phase 2 comparison
