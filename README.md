@@ -19,6 +19,36 @@ compute per sample — not realistic on a 16GB M2 laptop. So:
 - **Phase 2 (HPCC)** re-runs the *same* pipeline against a real human dataset,
   at full scale, using Explorer's compute/memory allocation.
 
+## Key Results
+
+Both phases independently confirmed the core biology of their respective
+datasets, validated across multiple methods (visual coverage, manual
+TPM calculation, and formal DESeq2 statistical testing):
+
+- **Phase 1 (pasilla knockdown):** pasilla itself ranked in the top 10
+  most significant genes genome-wide (log2FC = -2.09, padj = 1.33e-70),
+  confirming a ~4.25-fold knockdown — closely matching independent
+  estimates from raw coverage and TPM. 679 genes significantly
+  differentially expressed overall.
+- **Phase 2 (airway/dexamethasone):** CRISPLD2 — the glucocorticoid-
+  responsive gene identified in the original Himes et al. 2014 study —
+  showed a ~6.1-fold induction (log2FC = +2.61, padj = 1.45e-44),
+  matching both the manual TPM spot-check and the original publication's
+  finding. 3,574 genes significantly differentially expressed overall,
+  with GO enrichment showing coherent glucocorticoid-pathway biology
+  (cytoskeletal remodeling, cell adhesion, hormone response).
+
+Along the way, two genuine, previously-undiscovered bugs were found and
+fixed: a silent 0-reads failure in STAR 2.7.11b (isolated via systematic
+version testing), and a bash parameter-expansion bug in a Salmon wrapper
+script. A real data-integrity issue was also caught in Phase 2: 4 of 8
+downloaded SRA samples had silently mismatched paired-end read counts,
+fixed by switching `fasterq-dump`'s extraction mode.
+
+Full debugging narratives, all numbers, and plots are in
+[docs/phase1-notes.md](docs/phase1-notes.md) and
+[docs/phase2-notes.md](docs/phase2-notes.md).
+
 ## Dataset
 
 **Phase 1:** [GSE18508](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE18508)
@@ -97,12 +127,12 @@ rna-seq-learning/
 - [x] Phase 1: post-alignment QC
 - [x] Phase 1: quantification (Salmon)
 - [x] Phase 1: DESeq2 differential expression
-- [ ] Phase 1: functional analysis
-- [ ] Phase 1: writeup
+- [x] Phase 1: functional analysis
+- [x] Phase 1: writeup
 - [x] Phase 2: HPCC environment / module setup
 - [x] Phase 2: full human genome index
 - [x] Phase 2: full pipeline re-run
-- [ ] Phase 2: writeup + comparison to Phase 1
+- [x] Phase 2: writeup + comparison to Phase 1
 
 See [PLAN.md](PLAN.md) for the detailed checklist and time log.
 
