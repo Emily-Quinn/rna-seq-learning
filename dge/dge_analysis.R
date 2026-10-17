@@ -126,4 +126,8 @@ top10_lfc  <- head(LFC.sig[order(abs(LFC.sig$log2FoldChange), decreasing = TRUE)
 write.csv(top10_padj, "top10_by_padj.csv")
 write.csv(top10_lfc,  "top10_by_foldchange.csv")
 
+# Full significant gene list + background universe, for GO enrichment
+write.csv(LFC.sig, "sig_genes_full.csv")
+write.csv(LFC.gene, "all_tested_genes.csv")
+
 cat("Analysis complete. Plots + tables written to working directory.\n")
