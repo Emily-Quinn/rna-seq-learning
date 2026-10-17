@@ -357,11 +357,76 @@ shell.
 | Stage | Phase 1 (laptop, Drosophila) | Phase 2 (HPCC, human) |
 |---|---|---|
 | Genome size | ~140Mb | ~3.1Gb |
-| Index build time | | |
-| Alignment time/sample | | |
-| Peak memory used | | |
-| New tools/skills needed | conda/bash | SLURM, module system |
+| Index build time | ~70 seconds | ~56 minutes |
+| Alignment time/sample | ~6-8 minutes | ~3.5-6.5 minutes (SLURM job array, parallel; wall-clock per sample) |
+| Peak memory used | Not measured — no resource-usage logging was in place locally | Indexing: 51.86GB / 64GB requested (81% efficiency, comfortable margin). Alignment: 49.51GB / 48GB requested (103% efficiency — exceeded the request, narrowly avoided an OOM kill) |
+| New tools/skills needed | (none — conda/bash were the established baseline for this project, not newly learned) | tmux for persistent sessions, `seff` resource accounting, GENCODE vs. FlyBase GTF format differences, non-interactive batch-shell conda activation quirks |
+
+**Observations:**
+- **Alignment was actually faster per-sample in Phase 2** despite the
+  ~22x larger genome — Explorer's compute nodes are substantially more
+  powerful than a Rosetta-emulated STAR binary on an M2 MacBook, more
+  than offsetting the genome-size difference.
+- **Genome indexing scaled roughly proportionally** — ~48x longer
+  runtime for a ~22x larger genome, a reasonable relationship.
+- **Resource requests need real headroom, not just "enough":** the
+  alignment job's 48GB request came in *under* actual usage (49.51GB) —
+  it completed successfully this time, but was effectively one bad roll
+  away from an OOM kill. The indexing job's more generous 64GB request
+  (vs. 51.86GB actual) shows the kind of margin that should be standard
+  practice. Lesson for any future large-genome alignment: request at
+  least 55-60GB, not the 48GB used here.
 
 ## What was actually different at scale
+- **Resource management looked different, not absent.** Phase 1's
+  16GB M2 MacBook required its own real constraints and cleanup
+  discipline — using `CONDA_SUBDIR=osx-64` for Rosetta compatibility,
+  deleting uncompressed FASTQ duplicates and stale STAR index folders to
+  reclaim disk space, removing leftover test files. Phase 2 shifted this
+  from ad-hoc local disk/memory housekeeping to explicit, upfront SLURM
+  resource requests (CPU, memory, time limits) for every job — a more
+  structured process, but not a fundamentally new concept; both phases
+  required actively managing finite resources, just via different
+  mechanisms (manual cleanup vs. declared allocations). Getting Phase
+  2's estimates wrong had real consequences too (the alignment job's
+  48GB request narrowly avoided an OOM kill at 49.51GB actual usage).
+- **Parallelism became available, and mattered.** Phase 1's four
+  samples ran sequentially, one after another, since there was no
+  mechanism (or need) to do otherwise on a single laptop. Phase 2's
+  SLURM job arrays let all 8 samples' alignment, QC, and quantification
+  run simultaneously across separate compute nodes — meaningfully
+  reducing wall-clock time despite each individual task being no faster
+  (and the underlying genome being ~22x larger).
+- **New classes of failure emerged that don't exist on a laptop.**
+  Dropped SSH connections killing interactive jobs, a login node
+  OOM-killing lightweight commands, non-interactive batch shells not
+  inheriting the same conda initialization as an interactive shell — none of these are
+  problems a local single-machine pipeline can even produce. Phase 2's
+  debugging skillset was as much about the *cluster environment* as
+  about the actual bioinformatics tools.
+- **Real-world data is messier than a well-curated teaching dataset.**
+  Phase 1's pasilla dataset, despite being genuinely real data, is a
+  long-established teaching dataset — clean, well-behaved, extensively
+  used without major reported issues. Phase 2's airway dataset, also a
+  real published dataset, had a genuine, previously-undocumented-by-me
+  data-integrity issue (4 of 8 samples silently mismatched in R1/R2
+  pairing when downloaded the "normal" way) that required real
+  investigative work to catch and fix — a reminder that even
+  established, peer-reviewed datasets can have non-obvious technical
+  gotchas in their raw deposited files.
+- **Annotation format assumptions don't transfer between organisms.**
+  Both phases hit real GTF-format surprises (FlyBase's `mRNA`/non-coding
+  feature types vs. a generic `transcript` assumption in Phase 1;
+  confirming GENCODE's more standard format in Phase 2), reinforcing
+  that "check the actual file, don't assume convention" is a durable
+  lesson rather than a one-off Phase 1 quirk.
+- **The core biology and statistics did not change.** Despite the
+  scale, infrastructure, and failure-mode differences, the fundamental
+  pipeline logic (QC → trim → index → align → quantify → DESeq2 → GO
+  enrichment) and its validation approach (cross-checking a known
+  biological result across visual, manual, and statistical methods)
+  were identical and transferred directly — proof that the Phase 1
+  learning genuinely generalized, rather than needing to be relearned
+  for human-scale data.
 
 -
