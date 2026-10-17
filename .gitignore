@@ -48,3 +48,9 @@ __pycache__/
 
 # OS junk
 .DS_Store
+
+# HTML QC/trimming reports — large, regenerate on demand
+docs/qc_output/
+*.fastp.html
+*fastqc.html
+
