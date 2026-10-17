@@ -291,6 +291,21 @@ on the presence of the `transcript_id` attribute directly, regardless of
 feature type, then deduplicating — correctly captured 35,738 of the
 35,747 transcripts in the transcriptome fasta.
 
+### 7. Functional analysis (GO enrichment)
+
+Used clusterProfiler + org.Dm.eg.db for GO Biological Process enrichment
+on the 679 significant genes (background: 17,609 tested genes).
+
+**Result: 244 significantly enriched GO Biological Process terms.**
+Top terms dominated by carbohydrate/nucleotide metabolism (glycolysis
+genes: Gapdh1/Gapdh2, Eno, Pgi, Pgk, Tpi, Ldh), not splicing-related
+categories — see "What surprised me" section for discussion of why this
+makes sense given the distinction between differential expression and
+differential splicing analysis.
+
+**Key plots:** see `dge/go_results/` — `go_dotplot.png`, `go_barplot.png`,
+`go_enrichment_map.png`.
+
 ## What surprised me / what I'd do differently
 
 - **Silent failures were the hardest bugs to catch, and the most
@@ -330,6 +345,22 @@ feature type, then deduplicating — correctly captured 35,738 of the
   script drift, macOS/GNU tool differences, GTF format assumptions) was
   the actual learning experience, and is exactly what a more automated
   approach would have abstracted away.
+- **GO enrichment on pasilla's knockdown surfaced metabolic signatures
+  (glycolysis, nucleotide metabolism), not splicing-related terms** —
+  despite pasilla's well-known biological role as an alternative splicing
+  regulator. Checked explicitly: zero splicing-related GO terms appeared
+  anywhere in the 244 significantly enriched terms. This makes sense in
+  retrospect: a standard DESeq2 differential *expression* + GO enrichment
+  pipeline detects changes in overall mRNA abundance, not changes in
+  which *isoform* of a transcript gets produced — the latter is what
+  pasilla actually regulates, and what the original Brooks et al. 2011
+  study specifically analyzed. Detecting that would require a
+  differential splicing/exon-usage tool (e.g. DEXSeq, rMATS), a
+  genuinely different analysis from what this pipeline performs. Good
+  reminder that "differentially expressed" and "differentially spliced"
+  are distinct questions, and a gene can be biologically important for
+  splicing regulation without showing up as a straightforward expression
+  change itself.
 - **What I'd do differently:** set up `samples.txt` and `tx2gene.txt`
   generation earlier and more systematically — these were somewhat
   improvised at the end rather than planned as explicit pipeline steps
