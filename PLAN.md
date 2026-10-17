@@ -20,7 +20,7 @@ expression result.
 | 10 | Build transcriptome fasta, run Salmon quant | 1 hr | `scripts/07_salmon_quant.sh` |
 | 11 | Import counts with tximport, run DESeq2 | 2–3 hrs | `dge/dge_analysis.R` |
 | 12 | QC plots: PCA, MA plot, p-value histograms, volcano | 1–2 hrs | Same script |
-| 13 | Functional analysis: GO enrichment (GoSeq) | 2–3 hrs | Optional stretch goal |
+| 13 | Functional analysis: GO enrichment (GoSeq) | 2–3 hrs | Optional stretch goal. **Actual: used clusterProfiler + org.Dm.eg.db instead** — more modern tooling, better documentation/visualization, at the tradeoff of not correcting for RNA-seq gene-length bias the way GoSeq does. |
 | 14 | Write up docs/phase1-notes.md, finalize README | 2–3 hrs | Include screenshots of key plots |
 
 **Total: ~3–5 focused days**, realistically spread over 1–2 weeks around
@@ -35,11 +35,11 @@ not interactive laptop runs).
 | Step | Task | Notes |
 |---|---|---|
 | 1 | Get Explorer account access sorted, load required modules or build a conda env on cluster | Check if STAR/Salmon/samtools already exist as modules — saves reinstall time |
-| 2 | Write SLURM batch scripts for each stage (this is new vs. Phase 1) | Needs `#SBATCH` headers: partition, time, mem, cpus |
-| 3 | Download/index GRCh38 (request enough mem: 32–64GB) | This step alone can take a few hours |
-| 4 | Choose + download a real human dataset with a clear 2-group comparison | e.g. a public GEO dataset with disease vs. healthy or treated vs. untreated |
+| 2 | Write SLURM batch scripts for each stage (this is new vs. Phase 1) | Needs `#SBATCH` headers: partition, time, mem, cpus. **Actual: scripts were written incrementally, one per stage as each was reached**, rather than all upfront — made more sense once actual resource needs for each step became clearer through doing earlier steps. |
+| 3 | Choose + download a real human dataset with a clear 2-group comparison | e.g. a public GEO dataset with disease vs. healthy or treated vs. untreated. **Actual: done before GRCh38 download/index** (reordered from original plan) — chose the "airway" dataset (GSE52778), the standard human DESeq2/tximport teaching dataset, for the same reference-validation rationale as Phase 1's pasilla choice. |
+| 4 | Download/index GRCh38 (request enough mem: 32–64GB) | This step alone can take a few hours. **Actual: ~56 min at 64GB requested, 51.86GB peak used** — see docs/phase2-notes.md comparison table. |
 | 5 | Run full pipeline as batch jobs | Alignment per sample may take 30 min–a few hours depending on job resources |
-| 6 | DESeq2 analysis (can run locally on laptop once counts are downloaded — much smaller than raw data) | |
+| 6 | DESeq2 analysis (can run locally on laptop once counts are downloaded — much smaller than raw data) | **Actual: ran directly on Explorer instead**, in the same `deseq2` conda environment used throughout Phase 2 — simpler than transferring quant.sf files back to a laptop, and kept the whole Phase 2 pipeline self-contained on the cluster. |
 | 7 | Compare Phase 1 vs Phase 2 experience in writeup: what changed at scale, what new problems (queueing, storage quotas, walltime limits) came up | |
 
 Rough time budget: **1–3 weeks**, gated more by HPCC queue times and
