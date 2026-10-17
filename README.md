@@ -49,6 +49,16 @@ Full debugging narratives, all numbers, and plots are in
 [docs/phase1-notes.md](docs/phase1-notes.md) and
 [docs/phase2-notes.md](docs/phase2-notes.md).
 
+**Visual confirmation of the pasilla knockdown** (IGV coverage tracks at
+the pasilla locus, untreated vs. treated):
+
+![Pasilla locus coverage - IGV](docs/images/pasilla_locus_coverage.png)
+
+**Sample clustering by condition** (Phase 2, airway dataset — PCA on
+VST-transformed counts):
+
+![PCA plot - airway dataset](dge_airway/results/pca_plot.png)
+
 ## Dataset
 
 **Phase 1:** [GSE18508](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE18508)
