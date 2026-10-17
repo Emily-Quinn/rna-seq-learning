@@ -305,7 +305,52 @@ condition, shaped by cell line — check whether samples cluster primarily
 by treatment or by donor), `volcano_plot.png`, `ma_plot.png`,
 `pvalue_hist.png`, `fdr_hist.png`.
 
-### 8. Functional analysis
+### 8. Functional analysis (GO enrichment)
+
+Used clusterProfiler + org.Hs.eg.db (rather than GoSeq, CebolaLab's
+original suggestion) for GO Biological Process enrichment — chosen for
+better documentation, visualization, and wider current adoption, at the
+tradeoff of not correcting for RNA-seq gene-length bias the way GoSeq
+does.
+
+**Prep:** exported the full significant gene list (3,574 genes) and
+complete tested-gene background universe (63,140 genes) from the DESeq2
+results (`export_sig_genes_airway.R`). GENCODE's versioned Ensembl IDs
+(e.g. `ENSG00000103196.12`) were stripped to unversioned form
+(`ENSG00000103196`) to match `org.Hs.eg.db`'s expected key format.
+
+**Ran enrichment** (`scripts/17_airway_go_enrichment.R`) against the
+actual tested-gene background (not the whole genome default) — the
+statistically correct choice, since testing against genes that were
+never measurable in this experiment would inflate significance.
+
+**Result: 1,392 significantly enriched GO Biological Process terms**
+(out of ~63K background genes, 3,574 significant input genes). Top
+terms are strongly consistent with known dexamethasone/glucocorticoid
+pharmacology:
+
+| GO term | Description | padj |
+|---|---|---|
+| GO:0001503 | ossification | 1.06e-15 |
+| GO:0032970 | regulation of actin filament-based process | 7.01e-15 |
+| GO:0031589 | cell-substrate adhesion | 7.01e-15 |
+| GO:0070482 | response to oxygen levels | 1.91e-12 |
+| GO:0043434 | response to peptide hormone | 1.91e-12 |
+
+This tells a coherent biological story — dexamethasone, a glucocorticoid
+known to affect bone/connective-tissue metabolism and smooth muscle cell
+structure, shows enrichment in cytoskeletal remodeling, cell adhesion,
+and hormone-responsive signaling pathways, consistent with its known
+anti-inflammatory/immunomodulatory pharmacology.
+
+**Gotcha: `source activate deseq2` failed silently inside a SLURM batch
+script** (`there is no package called 'clusterProfiler'`), despite the
+same environment working fine interactively. Fixed by explicitly
+sourcing conda's shell integration (`source
+"$(conda info --base)/etc/profile.d/conda.sh"`) before `conda activate`
+— a more robust pattern for non-interactive batch shells, which don't
+automatically inherit the same initialization as an interactive login
+shell.
 
 ## Phase 1 vs Phase 2 comparison
 
