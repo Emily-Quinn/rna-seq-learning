@@ -50,6 +50,42 @@ solved the "what does each command do" problem in Phase 1.
 
 Use this section (or docs/phase1-notes.md / phase2-notes.md) to jot dated
 notes as you go — useful both for debugging later and for turning into a
-GitHub-friendly writeup.
+GitHub-friendly writeup. High-level milestones below; full detail in the
+docs/ notes files. Reconstructed from git commit history.
 
-- `YYYY-MM-DD`: ...
+- `2026-09-08`: Phase 1 project scaffold created.
+- `2026-09-10` to `2026-09-14`: environment setup, raw QC (FastQC/MultiQC),
+  fastp trimming for all 4 pasilla samples; Ensembl FTP restructuring
+  documented.
+- `2026-09-21` to `2026-09-24`: STAR 2.7.11b silent 0-reads bug found and
+  fixed (pinned 2.7.10b); alignment, post-alignment QC, bigwig/IGV
+  visualization, and Salmon quantification completed for all 4 samples;
+  `07_salmon_quant.sh` brace bug found and fixed.
+- `2026-09-26`: DESeq2 differential expression run; pasilla knockdown
+  confirmed (log2FC -2.09, padj 1.33e-70). Explorer cluster name
+  corrected (was mistakenly called "Discovery").
+- `2026-09-28`: Phase 2 dataset chosen — airway (GSE52778).
+- `2026-10-01`: Phase 2 started on Explorer HPC — conda environments
+  built, tmux/SSH/quota lessons documented.
+- `2026-10-05`: `fasterq-dump` pairing bug found and fixed — 4 of 8
+  airway samples had silently mismatched R1/R2 read counts
+  (`--split-files` -> `--split-3`).
+- `2026-10-06`: airway samples QC'd and trimmed; GRCh38 (GENCODE v46)
+  downloaded and indexed via SLURM (~56 min, 28GB index).
+- `2026-10-07`: all 8 airway samples aligned (STAR job array),
+  post-alignment QC'd, and quantified with Salmon; CRISPLD2 induction
+  confirmed (log2FC +2.61, padj 1.45e-44), matching Himes et al. 2014.
+  DESeq2 (paired `~cell_line + condition` design) run same day.
+- `2026-10-16` to `2026-10-17`: GO enrichment (clusterProfiler) completed
+  for both phases — airway showed coherent glucocorticoid-pathway
+  biology; pasilla surfaced metabolic rather than splicing signatures
+  (see phase1-notes.md for discussion). Phase 1/Phase 2 comparison table,
+  README Key Results section, embedded figures, and PLAN.md deviation
+  notes finalized, closing out the project.
+
+**Elapsed calendar time:** ~6 weeks (Sept 8 - Oct 17), spanning Phase 1's
+full local pipeline, Phase 2's full HPC pipeline, and functional analysis
+for both — longer than the original ~3-5 day (Phase 1) + 1-3 week
+(Phase 2) estimates, largely due to real debugging detours (4 major bugs
+found and fixed across both phases) and working around other
+commitments rather than in continuous focused blocks.
