@@ -67,6 +67,13 @@ VST-transformed counts):
 used in the official Bioconductor DESeq2 vignette, so there's a strong
 reference to check work against.
 
+| Sample (GSM) | Condition |
+|---|---|
+| GSM461177 | untreated |
+| GSM461178 | untreated |
+| GSM461180 | treated (knockdown) |
+| GSM461181 | treated (knockdown) |
+
 **Phase 2:** [GSE52778](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE52778)
 (the "airway" dataset) — four primary human airway smooth muscle cell
 lines, each with a dexamethasone-treated and untreated sample (8 samples
